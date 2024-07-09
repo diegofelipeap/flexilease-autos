@@ -1,8 +1,13 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import swaggerUi from 'swagger-ui-express';
+/*import swaggerJSDoc from 'swagger-jsdoc';  */
+
 import carRoutes from './routes/carRoutes';
 import reservationRoutes from './routes/reservationRoutes';
 import userRoutes from './routes/userRoutes';
+/*import authRoutes from './routes/authRoutes'; */
 
 dotenv.config();
 
@@ -11,14 +16,38 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use('/api', carRoutes);
-app.use('/api', reservationRoutes);
-app.use('/api', userRoutes);
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'FlexiLease Autos API',
+            version: '1.0.0',
+            description: 'API for FlexiLease Autos'
+        },
+        servers: [
+            {
+                url: 'http://localhost:3000'
+            }
+        ]
+    },
+    apis: ['./src/routes/*.ts']
+};
 
-app.get('/', (req, res) => {
-    res.send('Welcome to FlexiLease Autos API');
-});
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+app.use('/api/v1/cars', carRoutes);
+app.use('/api/v1/reservations', reservationRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/auth', authRoutes);
+
+mongoose.connect(process.env.MONGODB_URI || '', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+}).catch((err) => {
+    console.error('Database connection error:', err);
 });

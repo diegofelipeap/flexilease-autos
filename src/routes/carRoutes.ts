@@ -1,20 +1,23 @@
 import { Router } from 'express';
+import authMiddleware from '../middlewares/authMiddleware';
 
 const router = Router();
 
-router.get('/cars', (req, res) => {
+router.use(authMiddleware);
+
+router.get('/', (req, res) => {
     res.send('List of cars');
 });
 
-router.post('/cars', (req, res) => {
+router.post('/', (req, res) => {
     res.send('Add a new car');
 });
 
-router.put('/cars/:id', (req, res) => {
+router.put('/:id', (req, res) => {
     res.send(`Update car with id ${req.params.id}`);
 });
 
-router.delete('/cars/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
     res.send(`Delete car with id ${req.params.id}`);
 });
 
