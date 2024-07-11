@@ -1,24 +1,119 @@
-import { Router } from 'express';
-import authMiddleware from '../middlewares/authMiddleware';
+// src/routes/carRoutes.ts
 
-const router = Router();
+import express from 'express';
+import { createCar, getCars, getCarById, updateCar, deleteCar } from '../controllers/carController';
+import { authMiddleware } from '../middlewares/authMiddleware';
 
-router.use(authMiddleware);
+const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.send('List of cars');
-});
+/**
+ * @swagger
+ * tags:
+ *   name: Cars
+ *   description: Car management
+ */
 
-router.post('/', (req, res) => {
-    res.send('Add a new car');
-});
+/**
+ * @swagger
+ * /api/v1/cars:
+ *   post:
+ *     summary: Create a new car
+ *     tags: [Cars]
+ *     requestBody:
+ *       description: Car data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Car'
+ *     responses:
+ *       201:
+ *         description: Car created successfully
+ *       400:
+ *         description: Invalid input
+ */
+router.post('/', authMiddleware, createCar);
 
-router.put('/:id', (req, res) => {
-    res.send(`Update car with id ${req.params.id}`);
-});
+/**
+ * @swagger
+ * /api/v1/cars:
+ *   get:
+ *     summary: Get all cars
+ *     tags: [Cars]
+ *     responses:
+ *       200:
+ *         description: List of all cars
+ */
+router.get('/', getCars);
 
-router.delete('/:id', (req, res) => {
-    res.send(`Delete car with id ${req.params.id}`);
-});
+/**
+ * @swagger
+ * /api/v1/cars/{id}:
+ *   get:
+ *     summary: Get a car by ID
+ *     tags: [Cars]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Car ID
+ *     responses:
+ *       200:
+ *         description: Car details
+ *       404:
+ *         description: Car not found
+ */
+router.get('/:id', getCarById);
+
+/**
+ * @swagger
+ * /api/v1/cars/{id}:
+ *   put:
+ *     summary: Update a car by ID
+ *     tags: [Cars]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Car ID
+ *     requestBody:
+ *       description: Car data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Car'
+ *     responses:
+ *       200:
+ *         description: Car updated successfully
+ *       404:
+ *         description: Car not found
+ */
+router.put('/:id', authMiddleware, updateCar);
+
+/**
+ * @swagger
+ * /api/v1/cars/{id}:
+ *   delete:
+ *     summary: Delete a car by ID
+ *     tags: [Cars]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Car ID
+ *     responses:
+ *       200:
+ *         description: Car deleted successfully
+ *       404:
+ *         description: Car not found
+ */
+router.delete('/:id', authMiddleware, deleteCar);
 
 export default router;
