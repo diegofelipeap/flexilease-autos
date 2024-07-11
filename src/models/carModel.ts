@@ -1,37 +1,31 @@
-import mongoose, { Document, Schema } from 'mongoose';
-import { ICar } from './carModel';
-export interface ICar extends Document {
-    make: string;
-    model: string;
-    year: number;
-    pricePerDay: number;
-    available: boolean;
+// src/models/carModel.ts
+
+import mongoose, { Schema, Document } from 'mongoose';
+
+export interface IAccessory extends Document {
+  description: string;
 }
 
-const CarSchema: Schema = new Schema({
-    make: {
-        type: String,
-        required: true,
-    },
-    model: {
-        type: String,
-        required: true,
-    },
-    year: {
-        type: Number,
-        required: true,
-    },
-    pricePerDay: {
-        type: Number,
-        required: true,
-    },
-    available: {
-        type: Boolean,
-        default: true,
-    },
+export interface ICar extends Document {
+  model: string;
+  brand: string;
+  year: number;
+  color: string;
+  price: number;
+  accessories: IAccessory[];
+}
+
+const AccessorySchema: Schema = new Schema({
+  description: { type: String, required: true, unique: true }
 });
 
-// Exportando o modelo baseado no esquema definido
-const Car = mongoose.model<ICar>('Car', CarSchema);
+const CarSchema: Schema = new Schema({
+  model: { type: String, required: true },
+  brand: { type: String, required: true },
+  year: { type: Number, required: true, min: 1950, max: 2023 },
+  color: { type: String, required: true },
+  price: { type: Number, required: true },
+  accessories: { type: [AccessorySchema], required: true }
+});
 
-export default Car;
+export default mongoose.model<ICar>('Car', CarSchema);
